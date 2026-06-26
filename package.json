@@ -1,0 +1,13 @@
+{
+  "name": "widget-chat-dashboard",
+  "version": "1.0.0",
+  "description": "Manager-facing learning analytics dashboard with widget-to-chat AI interaction",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
