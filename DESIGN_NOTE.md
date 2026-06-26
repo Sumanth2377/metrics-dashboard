@@ -1,21 +1,18 @@
-# Design Note — Widget-to-Chat Interaction
+# Design Decisions - LearnIQ Metrics Dashboard
 
-## Core Design Decisions
+This document details the core design choices and architectural decisions implemented in the LearnIQ People Analytics Dashboard.
 
-**The selection moment is a scene transition, not a state change.** When a manager clicks a widget, the right panel doesn't just update — the context bar slides out upward while a new one slides in from below, and a thin indigo progress bar sweeps across the top. This directional animation communicates that the chat is now *about* the selected widget, making the context transfer feel intentional rather than incidental.
+## Core UX Decisions
 
-**Streaming text makes the AI feel alive before the user types anything.** Each pre-seeded AI opener streams in word-by-word at ~32ms/word, directly mimicking real LLM output. This single interaction answers the brief's core question — *"how does the AI response render?"* — in the most visceral way possible, and signals that the system is proactive, not just reactive.
+1. **Instant Context Transfer**: Selection of a widget updates the right chat panel instantly. Removing sliding animations ensures a fast, efficient workspace for managers who need to check multiple metrics quickly.
+2. **Streaming AI Responses**: Pre-seeded AI openers stream in word-by-word at 32ms per word. This simulates live LLM response generation and guides the manager's attention step-by-step through the core insight card.
+3. **Adaptive Visual Focus**: To minimize cognitive load, unselected widgets dim to 45% opacity when a specific metric is active. This focuses the manager's attention on the selected metric and its corresponding chat interface.
+4. **Structured Numeric Insights**: AI responses prioritize structured metrics (e.g., bold numbers, localized trend indicators) rather than long paragraphs of prose, making the analytics actionable.
+5. **Historical Data Simulation**: Selecting any previous date from the calendar updates all charts, gauges, tables, and counts deterministically. This allows managers to compare historical snapshots side-by-side with live data.
 
-**Widgets dim on selection to reduce cognitive load.** Rather than only highlighting the active widget, all others drop to 45% opacity. This mirrors the mental model of "zooming in" on one metric: the manager's attention is fully pulled into the selected data context, reducing the noise of the surrounding dashboard.
+## Front-End Layout & Architecture
 
-**The AI response renderer handles two distinct modes.** Streaming openers transition into a structured insight card (bold number + trend label) after text completion. Follow-up responses use a 800ms loading skeleton → instant markdown render (bold via regex). This demonstrates that analytics answers benefit from numeric emphasis rather than prose alone — a distinction that matters as the product scales to richer data types.
-
-## Assumptions Made
-
-- "AI response" is simulated — no real API is wired. Responses are keyword-matched with an 800ms latency + animated loading skeleton to feel realistic.
-- Desktop-only at 1280px per the constraints brief — a persistent warning banner guards against narrower viewports.
-- Keyboard navigation (↑↓ arrow keys to cycle widgets, Enter to select) is implemented for accessibility and power users; this is mentioned here rather than hidden in code comments.
-
-## Architecture Decision
-
-Express + vanilla JS/HTML with zero build step. Chart.js via CDN. No framework overhead — keeps the Node.js surface clean and lets evaluators read the code without mental overhead from JSX or component trees.
+1. **Vanilla Core Tech**: Built using standard HTML5, CSS3, and ES6 JavaScript with zero compile or build steps. This keeps the application load time fast, lightweight, and easy to review.
+2. **Neutral Dark Theme**: The dark mode is styled with a neutral charcoal color palette (zero blue tint) to maximize contrast, minimize eye strain, and fit a professional enterprise workspace.
+3. **Robust Grid Stability**: Columns use `minmax(0, 1fr)` and parent containers use `flex-shrink: 0` to prevent inner elements (Chart.js canvas, tables, progress indicators) from stretching, overflowing, or overlapping on small viewports.
+4. **Accessible Navigation**: The dashboard supports full keyboard navigation (arrow keys to cycle widgets, Escape to clear context, and clickable date targets).
